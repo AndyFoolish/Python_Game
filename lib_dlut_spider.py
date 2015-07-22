@@ -50,9 +50,9 @@ class dlutSpider(object) :
 		info["callNumber"] = otherInfo[5]
 		return info
 
-	def saveInfo(self, CollectInfo) :
+	def saveInfo(self, CollectInfo, writeFile) :
 		#保存结果
-		writeFile = open('dlut_lib_info.txt', 'a', encoding='utf-8')
+		# writeFile = open('dlut_lib_info.txt', 'a', encoding='utf-8')
 		for item in CollectInfo :
 			writeFile.writelines('题名：  ' + item['title'] + '\n')
 			writeFile.writelines('责任者： ' + item['author'] + '\n')
@@ -60,13 +60,14 @@ class dlutSpider(object) :
 			writeFile.writelines('出版日期：' + item['publishDate'] + '\n')
 			writeFile.writelines('索书号： ' + item['callNumber'] + '\n')
 			writeFile.write('\n\n')
-		writeFile.close()
+		# writeFile.close()
 
 def dlutLibSpider(initial_url, num):
 	#调用爬虫的函数
+	global count
 	lib_dlut_spider = dlutSpider()
 	page_group = lib_dlut_spider.changePage(initial_url, num)# 获取不同页面的url
-
+	writeFile = open('dlut_lib_info.txt', 'a', encoding='utf-8')
 	for page in page_group:
 		print("----正在处理页面----"+page)
 		CollectInfo = []
@@ -76,12 +77,19 @@ def dlutLibSpider(initial_url, num):
 			print("该页面无内容")
 			continue
 		else:
+			count += 1
 			for eachSource in source:
 				info = lib_dlut_spider.getInfo(eachSource)
 				CollectInfo.append(info)
-			lib_dlut_spider.saveInfo(CollectInfo)
-
+			lib_dlut_spider.saveInfo(CollectInfo, writeFile)
+	#保存书架总数
+	# with open('dlut_lib_info.txt', 'a', encoding='utf-8') as f:
+	# 	f.write('书架总数： ' + str(count))
+	writeFile.write('书架总数： ' + str(count))
+	writeFile.close()
+	
 initial_url = r'http://opac.lib.dlut.edu.cn/opac/show_user_shelf.php?classid=0000000000'
 num = 20000
+count = 0
 dlutLibSpider(initial_url, num)			
 print("爬取结束")
