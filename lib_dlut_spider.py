@@ -15,7 +15,7 @@ class dlutSpider(object) :
 		regexUrl = re.compile(r'classid=00000(\d+)', re.S)
 		nowPage = int(regexUrl.search(url).group(1))
 
-		for i in range(nowPage, totalPage) :
+		for i in range(nowPage, totalPage+1) :
 			link = re.sub('classid=00000\d+', 'classid=00000{0:05}'.format(i), url, re.S)
 			# link = re.sub('classid=00000\d+', 'classid=00000%05d'%i, url, re.S)
 			page_group.append(link)
@@ -52,7 +52,7 @@ class dlutSpider(object) :
 
 	def saveInfo(self, CollectInfo) :
 		#保存结果
-		writeFile = open('dlut_lib_info.txt', 'a')
+		writeFile = open('dlut_lib_info.txt', 'a', encoding='utf-8')
 		for item in CollectInfo :
 			writeFile.writelines('题名：  ' + item['title'] + '\n')
 			writeFile.writelines('责任者： ' + item['author'] + '\n')
@@ -81,7 +81,7 @@ def dlutLibSpider(initial_url, num):
 				CollectInfo.append(info)
 			lib_dlut_spider.saveInfo(CollectInfo)
 
-initial_url = "http://opac.lib.dlut.edu.cn/opac/show_user_shelf.php?classid=0000000000"
+initial_url = r'http://opac.lib.dlut.edu.cn/opac/show_user_shelf.php?classid=0000000000'
 num = 20000
 dlutLibSpider(initial_url, num)			
 print("爬取结束")
